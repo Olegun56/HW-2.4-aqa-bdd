@@ -24,6 +24,7 @@ public class LoginPage {
         loginInput.setValue(info.getLogin());
         passwordInput.setValue(info.getPassword());
         buttonActionLogin.click();
-        errorNotification.shouldBe(Condition.visible);
+        errorNotification.shouldBe(Condition.visible)
+                .shouldHave(Condition.text("Неверно указан логин или пароль"));
     }
 }

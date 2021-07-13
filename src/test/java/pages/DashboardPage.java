@@ -24,14 +24,14 @@ import static com.codeborne.selenide.Selenide.$$;
         heading.shouldBe(Condition.visible);
     }
 
-        public TransferPage transferTo(DataHelper.CardId cardId) {
-            String id = cardId.getId();
+        public TransferPage transferTo(DataHelper.CardInfo cardInfo) {
+            String id = cardInfo.getId();
             $(cardIdStart + id + cardIdFinish + " button").click();
             return new TransferPage();
         }
 
-        public int getCardBalance(DataHelper.CardId cardId) {
-            String id = cardId.getId();
+        public int getCardBalance(DataHelper.CardInfo cardInfo) {
+            String id = cardInfo.getId();
             String text2 = $(cardIdStart + id + cardIdFinish).text();
             val text = cards.find(text(text2)).text();
             return extractBalance(text);

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pages.DashboardPage;
 import pages.LoginPage;
+import pages.TransferPage;
 import pages.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.$;
@@ -25,62 +26,81 @@ public class TransferTests {
 
     @Test
     void shouldTransferMoneyFromFirstToSecondCards() {
-        val transferAmount = 5000;
+        val transferAmount = 500;
+        val transferPage = new TransferPage();
         val dashboardPageBeforeTransfer = new LoginPage()
                 .validLogin(getAuthInfo())
                 .validVerification(getVerificationCodeFor(getAuthInfo()));
-        int actualAmountFirst = dashboardPageBeforeTransfer.getCardBalance(getFirstCardId()) + transferAmount;
-        int actualAmountSecond = dashboardPageBeforeTransfer.getCardBalance(getSecondCardId()) - transferAmount;
+        int actualAmountFirst = dashboardPageBeforeTransfer.getCardBalance(getFirstCard()) + transferAmount;
+        if (transferAmount > dashboardPageBeforeTransfer.getCardBalance(getFirstCard())) {
+            transferPage.notificationError();
+        }
+        int actualAmountSecond = dashboardPageBeforeTransfer.getCardBalance(getSecondCard()) - transferAmount;
+        if (transferAmount > dashboardPageBeforeTransfer.getCardBalance(getSecondCard())) {
+            transferPage.notificationError();
+        }
         val dashboardPageAfterTransfer = dashboardPageBeforeTransfer
-                .transferTo(getFirstCardId())
+                .transferTo(getFirstCard())
                 .transferFrom(transferAmount, getSecondCard());
-        val balanceFirst = dashboardPageAfterTransfer.getCardBalance(getFirstCardId());
-        val balanceSecond = dashboardPageAfterTransfer.getCardBalance(getSecondCardId());
+        val balanceFirst = dashboardPageAfterTransfer.getCardBalance(getFirstCard());
+        val balanceSecond = dashboardPageAfterTransfer.getCardBalance(getSecondCard());
         assertEquals(actualAmountFirst, balanceFirst);
         assertEquals(actualAmountSecond, balanceSecond);
     }
 
     @Test
     void shouldTransferMoneyFromSecondToFirstCards() {
-        val transferAmount = 5000;
+        val transferAmount = 500;
+        val transferPage = new TransferPage();
         val dashboardPageBeforeTransfer = new LoginPage()
                 .validLogin(getAuthInfo())
                 .validVerification(getVerificationCodeFor(getAuthInfo()));
-        int actualAmountFirst = dashboardPageBeforeTransfer.getCardBalance(getFirstCardId()) - transferAmount;
-        int actualAmountSecond = dashboardPageBeforeTransfer.getCardBalance(getSecondCardId()) + transferAmount;
+        int actualAmountFirst = dashboardPageBeforeTransfer.getCardBalance(getFirstCard()) - transferAmount;
+        if (transferAmount > dashboardPageBeforeTransfer.getCardBalance(getFirstCard())) {
+            transferPage.notificationError();
+        }
+        int actualAmountSecond = dashboardPageBeforeTransfer.getCardBalance(getSecondCard()) + transferAmount;
+        if (transferAmount > dashboardPageBeforeTransfer.getCardBalance(getSecondCard())) {
+            transferPage.notificationError();
+        }
         val dashboardPageAfterTransfer = dashboardPageBeforeTransfer
-                .transferTo(getSecondCardId())
-                .transferFrom(transferAmount, getFirsCard());
-        val balanceFirst = dashboardPageAfterTransfer.getCardBalance(getFirstCardId());
-        val balanceSecond = dashboardPageAfterTransfer.getCardBalance(getSecondCardId());
+                .transferTo(getSecondCard())
+                .transferFrom(transferAmount, getFirstCard());
+        val balanceFirst = dashboardPageAfterTransfer.getCardBalance(getFirstCard());
+        val balanceSecond = dashboardPageAfterTransfer.getCardBalance(getSecondCard());
         assertEquals(actualAmountFirst, balanceFirst);
         assertEquals(actualAmountSecond, balanceSecond);
 
     }
 
     @Test
-    void shouldTransferOverBalanceMoney() {
+    void shouldNotTransferOverBalanceMoney() {
         val transferAmount = 50000;
+        val transferPage = new TransferPage();
         val dashboardPageBeforeTransfer = new LoginPage()
                 .validLogin(getAuthInfo())
                 .validVerification(getVerificationCodeFor(getAuthInfo()));
-        int actualAmountFirst = dashboardPageBeforeTransfer.getCardBalance(getFirstCardId()) + transferAmount;
-        int actualAmountSecond = dashboardPageBeforeTransfer.getCardBalance(getSecondCardId()) - transferAmount;
+        int actualAmountFirst = dashboardPageBeforeTransfer.getCardBalance(getFirstCard()) + transferAmount;
+        if (transferAmount > dashboardPageBeforeTransfer.getCardBalance(getFirstCard())) {
+            transferPage.notificationError();
+        }
+        int actualAmountSecond = dashboardPageBeforeTransfer.getCardBalance(getSecondCard()) - transferAmount;
+        if (transferAmount > dashboardPageBeforeTransfer.getCardBalance(getSecondCard())) {
+            transferPage.notificationError();
+        }
         val dashboardPageAfterTransfer = dashboardPageBeforeTransfer
-                .transferTo(getFirstCardId())
+                .transferTo(getFirstCard())
                 .transferFrom(transferAmount, getSecondCard());
-        val balanceFirst = dashboardPageAfterTransfer.getCardBalance(getFirstCardId());
-        val balanceSecond = dashboardPageAfterTransfer.getCardBalance(getSecondCardId());
+        val balanceFirst = dashboardPageAfterTransfer.getCardBalance(getFirstCard());
+        val balanceSecond = dashboardPageAfterTransfer.getCardBalance(getSecondCard());
         assertEquals(actualAmountFirst, balanceFirst);
         assertEquals(actualAmountSecond, balanceSecond);
     }
 
     @Test
-    void shouldLoginWithInvalidUserData() {
+    void shouldNotLoginWithInvalidUserData() {
         val loginPage = new LoginPage();
         loginPage.invalidLogin(getOtherAuthInfo());
-        $("[data-test-id=\"error-notification\"] .notification__content").shouldBe(Condition.visible)
-                .shouldHave(Condition.text("Неверно указан логин или пароль"));
     }
 
 }
